@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+
+  phpMyAdmin:
+    container_name: phpmyadmin_docker_symfony 
+    image: phpmyadmin
+    environment:
+      - PMA_HOST=database
+    depends_on:
+      - database
+    ports:
+      - "8080:80"
+
+  database:
+    container_name: database_docker_symfony
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: CyberCQ
+    volumes:
+      - mysql_vol:/var/lib/docker/volumes/mysql_vol/
+
+  maildev:
+        image: maildev/maildev
+        container_name: maildev_docker_symfony
+        command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+        ports:
+          - "8081:80"
+        restart: always
+
+  www:
+      build: php
+      container_name: www_docker_symfony
+      ports:
+        - "8741:80"
+      volumes:
+          - ./php/vhosts:/etc/apache2/sites-enabled
+          - ./:/var/www
+      restart: always
+
+
+volumes:
+  mysql_vol:
+
+
